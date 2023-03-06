@@ -4,7 +4,7 @@
 # ----------------------------------------------------
 # Git Pseudonymizer
 # ----------------------------------------------------
-# Version 0.2.0
+# Version 0.2.1
 # ----------------------------------------------------
 # https://github.com/qqdp/git-pseudonymizer
 # ----------------------------------------------------
@@ -96,7 +96,10 @@ else
 		echo "will then result in 'Student-1b <Student-1b@Student-1b>'"
 		echo "and a new author in 'Student-2a <Student-2a@Student-2a>'."
 		echo $seperator
-		read -p "Enter the indentifier: " identifier
+		while [ -z "$identifier" ]
+		do
+			read -p "Enter the indentifier: " identifier
+		done
 	fi
 	if [ -z "$blacklist" ]
 	then
@@ -163,9 +166,9 @@ function generate_mailmap () {
 		then
 			continue
 		else
-			if test -f ../$temp_filename*
+			if [ -f ../$temp_filename* ]
 			then
-				local old_filename=$(find . -name $temp_filename*)
+				local old_filename=$(find .. -name $temp_filename*)
 				echo $(pseudonymize_git_log $old_filename)
 			else
 				if [ -f ../$old_name* ]
@@ -195,9 +198,8 @@ function generate_mailmap () {
 }
 
 function pseudonymize_git_log () {
-	local filename=$1
-	
-	echo $(git filter-repo --mailmap ../$1 --force)
+	local filename=${1//"../"/}
+	echo $(git filter-repo --mailmap ../$filename --force)
 	
 	if [ "$mode" -eq 2 ]
 	then
