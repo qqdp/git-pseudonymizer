@@ -4,9 +4,9 @@ Pseudonymize or Anonymize one or more git repositories.
 
 ## Description
 
-This tool removes identifying data like names and email addresses from git repositories and replaces it with random generated data. The email address is used as an identifier and will always result in the same generated name/email replacement in a specific git repository. You can choose between pseudonymization and anonymization:
+This tool removes identifying data like names and email addresses from git repositories and replaces it with generated data. The email address is used as an identifier and will always result in the same generated name/email replacement in a specific git repository. You can choose between pseudonymization and anonymization:
 
-Pseudonymization will result in the same replacement for each original email address accross all provided git repositories with an option to keep the information about original email addresses and use the same generated data in future runs.
+Pseudonymization will result in the same replacement for each original email address accross all provided git repositories with an option to keep the information about original email addresses and use the same generated data in future runs. If a already replaced author name appears again with a different email address, the data will be replaced with the same ID but with the next letter from the alphabet (e.g. "Student-1a" and "Student-1b").
 
 Anonymization will do the same replacement, but will always generate a new name/email combination for each given repository no matter if the original email address was detected before or not.
 
@@ -21,11 +21,11 @@ Local changes made using this tool are permanent and can't be reverted.
 Implemented:
 
 * Remove identifying data from git logs
-* The current implementation is only working for one person git repositories. It will replace all names and email addresses based on the email address used in the latest commit.
+* Set a custom name to be used to replace names and email addresses
+* Blacklist email addresses to prevent specific authors not to be replaced
 
 Planned:
 
-* Individual detection and pseudonymization of all author email addresses in a single git log
 * Detection and removal of identifying data from files
 
 ## Dependencies
@@ -47,14 +47,14 @@ Planned:
 3. Run the script in unix shell with or without flags:
    
    ```shell
-   git-pseudonymizer.sh --mode * --repo-folder * --repo-folder-direct * --rm-mailmap
+   git-pseudonymizer.sh --mode * --repo-folder * --identifier * --blacklist * --rm-mailmap
    ```
 
 ## Flags
 
-You have to run this tool with at least one of the repo-folder flags. You will then be asked to enter the mode and mailmap preference into the console step by step.
+You have to run this tool with at least the repo-folder flag. You will then be asked to enter the mode, identifier, blacklist and mailmap preference into the console step by step.
 
-Providing --mode and --repo-folder/--repo-folder-direct will run the tool without any console prompts.
+Providing --repo-folder, --mode, --identifier and --blacklist will run the tool without any console prompts.
 
 #### --mode
 
@@ -64,15 +64,21 @@ Providing --mode and --repo-folder/--repo-folder-direct will run the tool withou
 
 #### --repo-folder (required)
 
-Provide the path to a folder containing one or more git repositories. Should not be used with --repo-folder-direct.
+Provide the path to a folder containing one or more git repositories.
 
 - Example: `--repo-folder /path/to/folder`
 
-#### --repo-folder-direct (required)
+#### --identifier (optional)
 
-Provide the direct path for a single git repository. Should not be used with --repo-folder.
+Provide a String to be used for Name/Email replacements.
 
-- Example: `--repo-folder-direct /path/to/repo`
+- Example: `--identifier Student`
+
+#### --blacklist (optional)
+
+Provide email addresses in order to ignore specific authors (these will not be replaced). A blacklist file will be created in the provided folder.
+
+- Example: `--blacklist example@example example2@example2`
 
 #### --rm-mailmap (optional)
 
@@ -81,6 +87,11 @@ This flag will force the removal of all generated mailmap files. Using --mode 2 
 - Example: `--repo-folder-direct /path/to/repo`
 
 ## Version History
+
+* 0.2.0
+  * Detection of different authors
+  * Option to set custom identifier
+  * Option to blacklist email addresses
 
 * 0.1.0
   * Initial Release
