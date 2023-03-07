@@ -30,7 +30,7 @@ while (("$#")); do
 	--repo-folder)
 		if [ "$2" ]
 		then
-			repo_folder="$2""/*"
+			repo_folder="$2""/"
 		fi;;
 	--repo-folder-direct)
 		if [ "$2" ]
@@ -207,14 +207,14 @@ function pseudonymize_git_log () {
 	fi
 }
 
-cd ${repo_folder::-1}
+cd $repo_folder
 echo $blacklist >> ./blacklist
 
-for d in $repo_folder; do if [ ! -d "$d" ]; then continue; else (cd "$d" && generate_mailmap) fi; done
+for d in "$repo_path"*""; do if [ ! -d "$d" ]; then continue; else (cd "$d" && generate_mailmap) fi; done
 
 if [ "$rm_mailmap" -eq 1 ]
 then
-	cd ${repo_folder::-1}
+	cd $repo_folder
 	find -type f -name '*mailmap*' -delete
 fi
 
