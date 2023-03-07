@@ -4,7 +4,7 @@
 # ----------------------------------------------------
 # Git Pseudonymizer
 # ----------------------------------------------------
-# Version 0.2.1
+# Version 0.2.2
 # ----------------------------------------------------
 # https://github.com/qqdp/git-pseudonymizer
 # ----------------------------------------------------
@@ -21,6 +21,7 @@ rm_mailmap=0
 repo_folder=
 identifier=
 blacklist=
+tac=
 
 name_index=1
 alphabet=( {a..z} )
@@ -31,11 +32,6 @@ while (("$#")); do
 		if [ "$2" ]
 		then
 			repo_folder="$2""/"
-		fi;;
-	--repo-folder-direct)
-		if [ "$2" ]
-		then
-			repo_folder="$2"
 		fi;;
 	--mode)
 		if [ "$2" ]
@@ -61,7 +57,7 @@ done
 if [ -z "$repo_folder" ]
 then
 	echo $seperator
-	echo "Please provide a valid path using --repo-folder or --repo-folder-direct"
+	echo "Please provide a valid path using --repo-folder"
 	echo $seperator
 	exit 1
 else
@@ -152,7 +148,7 @@ function generate_mailmap () {
 	echo $(basename "$PWD")
 	echo $seperator
 
-	for C in $(git log | grep commit\   | sed "s;commit ;;" | tac | xargs echo)
+	for C in $(git log | grep commit\   | sed "s;commit ;;" | $tac | xargs echo)
 	do
 		local temp_old_name=$(git show -s --format='%an' $C)
 		local old_name=${temp_old_name// /}
@@ -207,6 +203,16 @@ function pseudonymize_git_log () {
 	fi
 }
 
+case $OSTYPE in
+  darwin*)
+    tac='tail -r'
+    ;;
+
+  *)
+    tac='tac'
+    ;;
+esac
+
 cd $repo_folder
 echo $blacklist >> ./blacklist
 
@@ -215,7 +221,7 @@ for d in "$repo_path"*""; do if [ ! -d "$d" ]; then continue; else (cd "$d" && g
 if [ "$rm_mailmap" -eq 1 ]
 then
 	cd $repo_folder
-	find -type f -name '*mailmap*' -delete
+	find . -type f -name '*mailmap*' -delete
 fi
 
 echo $seperator

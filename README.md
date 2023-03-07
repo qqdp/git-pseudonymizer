@@ -88,6 +88,9 @@ This flag will force the removal of all generated mailmap files. Using --mode 2 
 
 ## Version History
 
+* 0.2.2
+  * Add OS detection/handling
+
 * 0.2.1
   * Prevention of empty identifier
   * Fix mailmap access across repositories
